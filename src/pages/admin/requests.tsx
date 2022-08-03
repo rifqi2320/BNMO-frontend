@@ -5,6 +5,7 @@ import {
   useMediaQuery,
   useToast,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import TransactionTable from "../../components/tables/transactionTable";
 import { useAuth } from "../../context/auth";
@@ -32,10 +33,10 @@ const Requests = () => {
         }
       })
       .catch((err) => {
-        if (err.message) {
+        if (err.response.data.message) {
           toast({
             title: "Error",
-            description: err.message,
+            description: err.response.data.message,
             status: "error",
           });
         } else {
@@ -55,16 +56,16 @@ const Requests = () => {
           revalidateRequests();
           toast({
             title: "Success",
-            description: "User verified",
+            description: res.message,
             status: "success",
           });
         }
       })
       .catch((err) => {
-        if (err.message) {
+        if (err.response.data.message) {
           toast({
             title: "Error",
-            description: err.message,
+            description: err.response.data.message,
             status: "error",
           });
         } else {

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types/models";
 import { getSelfData, login } from "../lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
 
 type AuthContext = {
   isLoading: boolean;
@@ -9,6 +10,7 @@ type AuthContext = {
   token: string | null;
   login: (username: string, password: string) => Promise<User | null>;
   logout: () => void;
+  revalidateUser: () => Promise<void>;
 };
 
 type AuthContextData = {
@@ -25,6 +27,7 @@ const Auth = createContext<AuthContext>({
     return null;
   },
   logout: () => {},
+  revalidateUser: async () => {},
 });
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -33,6 +36,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   const loginHandler = async (
     username: string,
@@ -40,6 +44,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ): Promise<User | null> => {
     const res = await login(username, password);
     if (res.isError || res.data === null) {
+      return null;
+    }
+    if (res.data.user.isVerified === false) {
+      toast({
+        title: "Error",
+        description: "User is not yet verified",
+        status: "error",
+      });
       return null;
     }
     localStorage.setItem("token", res.data.token);
@@ -53,6 +65,35 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("token");
   };
 
+  const revalidate = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      getSelfData(token)
+        .then((res) => {
+          if (res && res.data) {
+            setUser(res.data.userData);
+            if (
+              res.data.userData.role === "ADMIN" &&
+              !location.pathname.includes("admin")
+            ) {
+              navigate("/admin");
+            } else if (
+              res.data.userData.role === "USER" &&
+              !location.pathname.includes("user")
+            ) {
+              navigate("/user");
+            }
+          }
+        })
+        .catch((err) => {
+          logoutHandler();
+        });
+      setToken(token);
+    } else {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setIsLoading(true);
     if (user) {
@@ -60,19 +101,32 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       const token = localStorage.getItem("token");
       if (token) {
-        getSelfData(token).then((res) => {
-          if (res.isError || !res.data) {
+        getSelfData(token)
+          .then((res) => {
+            if (res && res.data) {
+              setUser(res.data.userData);
+              if (
+                res.data.userData.role === "ADMIN" &&
+                !location.pathname.includes("admin")
+              ) {
+                navigate("/admin");
+              } else if (
+                res.data.userData.role === "USER" &&
+                !location.pathname.includes("user")
+              ) {
+                navigate("/user");
+              }
+            }
+          })
+          .catch((err) => {
             logoutHandler();
-          } else {
-            setUser(res.data.user);
-          }
-        });
+          });
         setToken(token);
       } else {
         setIsLoading(false);
       }
     }
-  }, [user]);
+  }, [user, navigate]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -81,8 +135,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         location.pathname !== "/login" &&
         location.pathname !== "/register"
       ) {
-        navigate("/login");
-      } else if (location.pathname === "/") {
         navigate("/login");
       }
     }
@@ -103,6 +155,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ...providerValue,
         login: loginHandler,
         logout: logoutHandler,
+        revalidateUser: revalidate,
       }}
     >
       {children}

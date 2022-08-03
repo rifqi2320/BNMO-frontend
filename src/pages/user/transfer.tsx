@@ -11,14 +11,16 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import TransactionTable from "../../components/tables/transactionTable";
 import { useAuth } from "../../context/auth";
 import { transfer } from "../../lib/api";
 import { UserContext } from "../../types/context";
+import { Transaction } from "../../types/models";
 
 const Transfer = () => {
+  const { revalidateUser } = useAuth();
   const { data, revalidate } = useOutletContext<UserContext>();
   const toast = useToast();
   const [formData, setFormData] = useState({
@@ -26,6 +28,7 @@ const Transfer = () => {
     to: "",
     description: "",
   });
+  const [filteredData, setFilteredData] = useState<Transaction[]>([]);
   const { token } = useAuth();
   const handleSubmitTransfer = async () => {
     if (formData.amount > 0 && formData.to) {
@@ -39,13 +42,14 @@ const Transfer = () => {
               status: "success",
             });
             setFormData({ ...formData, amount: 0 });
+            revalidateUser();
           }
         })
         .catch((err) => {
-          if (err.message) {
+          if (err.response.data.message) {
             toast({
               title: "Error",
-              description: err.message,
+              description: err.response.data.message,
               status: "error",
             });
           } else {
@@ -72,6 +76,12 @@ const Transfer = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      setFilteredData(data.filter((transaction) => !!transaction.from));
+    }
+  }, [data]);
 
   return (
     <>
@@ -119,7 +129,7 @@ const Transfer = () => {
           </FormControl>
         </VStack>
         <TransactionTable
-          transactions={data}
+          transactions={filteredData}
           cols={["createdAt", "amount", "to"]}
         />
       </Stack>

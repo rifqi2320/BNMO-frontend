@@ -11,64 +11,31 @@ const Admin = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [requests, setRequests] = useState<Transaction[]>([]);
+  const [requests, setRequests] = useState<Transaction[] | null>(null);
   const revalidateRequests = async () => {
-    console.log("revalidateRequests");
-    setRequests([]);
-    await getRequests(token)
-      .then((res) => {
-        if (!res.isError && res.data) {
-          setRequests(res.data.transactions);
-        }
-      })
-      .catch((err) => {
-        if (err.message) {
-          toast({
-            title: "Error",
-            description: err.message,
-            status: "error",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Something went wrong",
-            status: "error",
-          });
-        }
-      });
+    setRequests(null);
+    await getRequests(token).then((res) => {
+      if (!res.isError && res.data) {
+        setRequests(res.data.transactions);
+      }
+    });
   };
 
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[] | null>(null);
   const revalidateUsers = async () => {
-    setUsers([]);
-    await getUsers(token)
-      .then((res) => {
-        if (!res.isError && res.data) {
-          setUsers(res.data.users);
-        }
-      })
-      .catch((err) => {
-        if (err.message) {
-          toast({
-            title: "Error",
-            description: err.message,
-            status: "error",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Something went wrong",
-            status: "error",
-          });
-        }
-      });
+    setUsers(null);
+    await getUsers(token).then((res) => {
+      if (!res.isError && res.data) {
+        setUsers(res.data.users);
+      }
+    });
   };
 
   useEffect(() => {
-    if (!users || !users.length) {
+    if (!users) {
       revalidateUsers();
     }
-    if (!requests || !requests.length) {
+    if (!requests) {
       revalidateRequests();
     }
 

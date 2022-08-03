@@ -15,17 +15,30 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth";
 import ColorModeButton from "../utils/colorModeButton";
 
 const Navbar = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
   const [isVerySmallScreen] = useMediaQuery("(max-width: 380px)");
   const [image, setImage] = useState("/bmo/bmo_1.png");
+  const [balanceText, setBalanceText] = useState("");
+
+  useEffect(() => {
+    if (user && user.balance !== undefined) {
+      const num = Math.floor(user.balance);
+      const format = num.toString().split("").reverse().join("");
+      const convert = format.match(/\d{1,3}/g);
+      if (convert) {
+        const rupiah = "Rp. " + convert.join(".").split("").reverse().join("");
+        setBalanceText(rupiah);
+      }
+    }
+  }, [user]);
 
   const randomizeBMO = () => {
     let num: number = 1;
@@ -51,11 +64,11 @@ const Navbar = () => {
       <ColorModeButton variant="ghost" />
       <Menu>
         <MenuButton as={Button} borderRadius="3xl" colorScheme={"gray"}>
-          {isVerySmallScreen ? " " : "Balance : "}Rp.300.000,-{" "}
-          <ChevronDownIcon />
+          {isVerySmallScreen ? " " : "Balance : "}
+          {balanceText} <ChevronDownIcon />
         </MenuButton>
         <MenuList>
-          <MenuGroup title="Rifqi Naufal Abdjul">
+          <MenuGroup title={user?.username}>
             <Divider />
             <MenuItem onClick={() => navigate("/user/history")}>
               Transaction History

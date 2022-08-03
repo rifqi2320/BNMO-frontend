@@ -2,6 +2,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import {
   Center,
   Flex,
+  Heading,
   HStack,
   IconButton,
   Link,
@@ -59,7 +60,7 @@ const UserData = {
   },
   balance: {
     label: "Balance",
-    render: (user: User) => user.balance,
+    render: (user: User) => (user.balance ? Math.floor(user.balance) : 0),
   },
   isVerified: {
     label: "Verified",
@@ -71,11 +72,11 @@ const UserData = {
   },
   createdAt: {
     label: "Created",
-    render: (user: User) => user.createdAt.toLocaleString(),
+    render: (user: User) => new Date(user.createdAt).toDateString(),
   },
   updatedAt: {
     label: "Updated",
-    render: (user: User) => user.updatedAt.toLocaleString(),
+    render: (user: User) => new Date(user.updatedAt).toDateString(),
   },
 };
 
@@ -92,10 +93,18 @@ const UserTable = ({
   const [page, setPage] = useState(1);
   const { colorMode } = useColorMode();
 
-  if (!users || users.length === 0) {
+  if (!users) {
     return (
       <Center minH="200px">
         <Spinner color={colorMode === "dark" ? "white" : "black"} size={"xl"} />
+      </Center>
+    );
+  }
+
+  if (users.length === 0) {
+    return (
+      <Center minH="200px">
+        <Heading>No Data</Heading>
       </Center>
     );
   }
@@ -112,7 +121,7 @@ const UserTable = ({
             </Tr>
           </Thead>
           <Tbody>
-            {users.slice((page - 1) * 5, page * 5).map((item) => (
+            {users.slice((page - 1) * 4, page * 4).map((item) => (
               <Tr key={item.id}>
                 {cols.map((col) => (
                   <Td key={col}>{UserData[col].render(item)}</Td>
@@ -140,7 +149,7 @@ const UserTable = ({
           w="75px"
           defaultValue={1}
           min={1}
-          max={(users.length - 1) / 5 + 1}
+          max={(users.length - 1) / 4 + 1}
           value={page}
           onChange={(_, num) => setPage(num)}
         >

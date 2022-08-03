@@ -10,10 +10,13 @@ import {
   Link,
   Text,
   useColorMode,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InputFile from "../components/utils/inputFile";
+import { register } from "../lib/api";
 import { RegisterReq } from "../types/api";
 import ColorModeButton from "./../components/utils/colorModeButton";
 
@@ -30,6 +33,8 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const navigate = useNavigate();
+  const toast = useToast();
 
   // Form Validation
   useEffect(() => {
@@ -40,9 +45,33 @@ const Register = () => {
     }
   }, [formData]);
 
-  // TODO: add api calls then redirect to login page
-  const handleSubmit = () => {
-    console.log({ formData, file });
+  const handleSubmit = async () => {
+    await register(formData.username, formData.password, file)
+      .then((res) => {
+        if (!res.isError && res.data) {
+          navigate("/login");
+          toast({
+            title: "Success",
+            description: res.message,
+            status: "success",
+          });
+        }
+      })
+      .catch((err) => {
+        if (err.response.data.message) {
+          toast({
+            title: "Error",
+            description: err.response.data.message,
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Something went wrong",
+            status: "error",
+          });
+        }
+      });
   };
 
   return (

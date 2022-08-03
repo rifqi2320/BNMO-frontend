@@ -5,8 +5,8 @@ export type Transaction = {
   description: string | null;
   amount: number;
   approved: boolean;
-  approvedAt: Date | null;
-  createdAt: Date;
+  approvedAt: string | null;
+  createdAt: string;
 };
 
 export type User = {
@@ -16,6 +16,6 @@ export type User = {
   balance?: number;
   isVerified: boolean;
   role: "USER" | "ADMIN";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };

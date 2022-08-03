@@ -47,10 +47,10 @@ const Users = () => {
         }
       })
       .catch((err) => {
-        if (err.message) {
+        if (err.response.data.message) {
           toast({
             title: "Error",
-            description: err.message,
+            description: err.response.data.message,
             status: "error",
           });
         } else {

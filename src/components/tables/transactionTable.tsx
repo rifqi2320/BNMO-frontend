@@ -2,6 +2,7 @@ import { CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Center,
   Flex,
+  Heading,
   HStack,
   IconButton,
   NumberDecrementStepper,
@@ -66,11 +67,14 @@ const TransactionData = {
   approvedAt: {
     label: "Approved At",
     render: (transaction: Transaction) =>
-      transaction.approvedAt ? transaction.approvedAt.toDateString() : "",
+      transaction.approvedAt
+        ? new Date(transaction.approvedAt).toDateString()
+        : "",
   },
   createdAt: {
     label: "Date",
-    render: (transaction: Transaction) => transaction.createdAt.toDateString(),
+    render: (transaction: Transaction) =>
+      new Date(transaction.createdAt).toDateString(),
   },
 };
 
@@ -89,10 +93,18 @@ const TransactionTable = ({
   const [page, setPage] = useState(1);
   const { colorMode } = useColorMode();
 
-  if (!transactions || transactions.length === 0) {
+  if (!transactions) {
     return (
       <Center minH="200px">
         <Spinner color={colorMode === "dark" ? "white" : "black"} size={"xl"} />
+      </Center>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <Center minH="200px">
+        <Heading>No Data</Heading>
       </Center>
     );
   }
@@ -109,7 +121,7 @@ const TransactionTable = ({
             </Tr>
           </Thead>
           <Tbody>
-            {transactions.slice((page - 1) * 5, page * 5).map((item) => (
+            {transactions.slice((page - 1) * 4, page * 4).map((item) => (
               <Tr key={item.id}>
                 {cols.map((col) => (
                   <Td key={col}>{TransactionData[col].render(item)}</Td>
@@ -145,7 +157,7 @@ const TransactionTable = ({
           w="75px"
           defaultValue={1}
           min={1}
-          max={(transactions.length - 1) / 5 + 1}
+          max={(transactions.length - 1) / 4 + 1}
           value={page}
           onChange={(_, num) => setPage(num)}
         >

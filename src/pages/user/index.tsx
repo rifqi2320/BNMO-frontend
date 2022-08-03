@@ -31,7 +31,7 @@ const User = () => {
     transfer: "",
     request: "",
   });
-  const [data, setData] = useState<Transaction[]>([]);
+  const [data, setData] = useState<Transaction[] | null>(null);
 
   useEffect(() => {
     // TODO: Create lib to generate color like this
@@ -55,7 +55,7 @@ const User = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (!data || !data.length) {
+    if (!data) {
       revalidate();
     }
 
@@ -69,7 +69,7 @@ const User = () => {
     }
 
     if (!ValidTabs.includes(tab)) {
-      navigate("/user/history");
+      // navigate("/user/history");
     }
   });
 
@@ -81,8 +81,7 @@ const User = () => {
   };
 
   const revalidate = async () => {
-    console.log("revalidate");
-    setData([]);
+    setData(null);
     const { isError, data: res } = await getSelfTransactions(token);
     if (!isError && res) {
       setData(res.transactions);

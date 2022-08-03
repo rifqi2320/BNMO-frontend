@@ -12,6 +12,213 @@ import {
   VerifyRes,
 } from "../types/api";
 
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+export const register = async (
+  username: string,
+  password: string,
+  photoID: File | undefined
+): Promise<Res<RegisterRes>> => {
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
+  if (photoID) {
+    formData.append("photoid", photoID);
+  }
+  const res: Res<RegisterRes> = await api.post("/auth/register", formData);
+  return res;
+};
+
+export const login = async (
+  username: string,
+  password: string
+): Promise<Res<LoginRes>> => {
+  const res: Res<LoginRes> = await api
+    .post("/auth/login", {
+      username,
+      password,
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const getSelfData = async (
+  token: string | null
+): Promise<Res<SelfDataRes>> => {
+  const res: Res<SelfDataRes> = await api
+    .get("/self", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const getSelfTransactions = async (
+  token: string | null
+): Promise<Res<TransactionsRes>> => {
+  const res: Res<TransactionsRes> = await api
+    .get("/transaction", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const transfer = async (
+  to: string,
+  description: string,
+  amount: number,
+  token: string | null
+): Promise<Res<TransactionRes>> => {
+  const res: Res<TransactionRes> = await api
+    .post(
+      "/transaction/transfer",
+      {
+        to,
+        description,
+        amount,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => response.data);
+  return res;
+};
+
+export const requestBalance = async (
+  currency: string,
+  amount: number,
+  token: string | null
+): Promise<Res<TransactionRes>> => {
+  const res: Res<TransactionRes> = await api
+    .post(
+      "/transaction/request-balance",
+      {
+        currency,
+        amount,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => response.data);
+  return res;
+};
+
+export const getCurrencies = async (
+  token: string | null
+): Promise<Res<CurrenciesRes>> => {
+  const res: Res<CurrenciesRes> = await api
+    .get("/transaction/currency", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const getUsers = async (
+  token: string | null
+): Promise<Res<UsersRes>> => {
+  const res: Res<UsersRes> = await api
+    .get("/admin/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const verifyUser = async (
+  userId: string,
+  token: string | null
+): Promise<Res<VerifyRes>> => {
+  const res: Res<VerifyRes> = await api
+    .put(
+      `/admin/users/${userId}/verify`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => response.data);
+  return res;
+};
+
+export const getRequests = async (
+  token: string | null
+): Promise<Res<TransactionsRes>> => {
+  const res: Res<TransactionsRes> = await api
+    .get("/admin/transaction", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
+  return res;
+};
+
+export const approveRequest = async (
+  id: string,
+  token: string | null
+): Promise<Res<ApproveRequestRes>> => {
+  const res: Res<ApproveRequestRes> = await api
+    .post(
+      `/admin/transaction/${id}/approve`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => response.data);
+  return res;
+};
+
+export const rejectRequest = async (
+  id: string,
+  token: string | null
+): Promise<Res<RejectRequestRes>> => {
+  const res: Res<RejectRequestRes> = await api
+    .post(
+      `/admin/transaction/${id}/reject`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((response) => response.data);
+
+  return res;
+};
+
+export const rejectStub = async (): Promise<any> => {
+  return Promise.reject({
+    isError: true,
+    message: "Reject Stub",
+  });
+};
+
 const currency = [
   "AED",
   "AFN",
@@ -263,327 +470,3 @@ const TransactionData = [
     createdAt: new Date(),
   },
 ];
-
-export const register = async (
-  username: string,
-  password: string,
-  photoID: File | null
-): Promise<Res<RegisterRes>> => {
-  let res: Res<RegisterRes>;
-  res = {
-    isError: false,
-    message: "Register Success",
-    data: {
-      user: {
-        id: "cl67lnui200069jpl73ij4jfs",
-        username: "naufal",
-      },
-    },
-  };
-  return res;
-};
-
-export const login = async (
-  username: string,
-  password: string
-): Promise<Res<LoginRes>> => {
-  let res: Res<LoginRes>;
-  if (username === "admin" && password === "admin") {
-    res = {
-      isError: false,
-      message: "Login Successful",
-      data: {
-        token: "admin-token",
-        user: {
-          id: "admin",
-          username: "admin",
-          photoID: "",
-          balance: 0,
-          isVerified: true,
-          role: "ADMIN",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    };
-  } else if (username === "user" && password === "user") {
-    res = {
-      isError: false,
-      message: "Login Successful",
-      data: {
-        token: "user-token",
-        user: {
-          id: "user",
-          username: "user",
-          photoID: "",
-          balance: 0,
-          isVerified: true,
-          role: "USER",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    };
-  } else {
-    res = {
-      isError: true,
-      message: "Login Failed",
-      data: null,
-    };
-  }
-  return res;
-};
-
-export const getSelfData = async (
-  token: string | null
-): Promise<Res<SelfDataRes>> => {
-  let res: Res<SelfDataRes>;
-  if (token === "admin-token") {
-    res = {
-      isError: false,
-      message: "Get Self Data Successful",
-      data: {
-        user: {
-          id: "admin",
-          username: "admin",
-          photoID: "",
-          balance: 0,
-          isVerified: true,
-          role: "ADMIN",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    };
-  } else {
-    res = {
-      isError: false,
-      message: "Get Self Data Successful",
-      data: {
-        user: {
-          id: "user",
-          username: "user",
-          photoID: "",
-          balance: 0,
-          isVerified: true,
-          role: "USER",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    };
-  }
-  return res;
-};
-
-export const getSelfTransactions = async (
-  token: string | null
-): Promise<Res<TransactionsRes>> => {
-  let res: Res<TransactionsRes>;
-  res = {
-    isError: false,
-    message: "Get Self Transactions Successful",
-    data: {
-      transactions: TransactionData,
-    },
-  };
-  return res;
-};
-
-export const transfer = async (
-  to: string,
-  description: string,
-  amount: number,
-  token: string | null
-): Promise<Res<TransactionRes>> => {
-  let res: Res<TransactionRes>;
-  res = {
-    isError: false,
-    message: "Transfer Success",
-    data: {
-      transaction: {
-        id: "cl67m3kyi0152cxn68a4b6yof",
-        from: "cl67f3g6x0005awpvkigw9xqo",
-        to: "naufal",
-        description: null,
-        amount: 1,
-        approved: true,
-        approvedAt: null,
-        createdAt: new Date(),
-      },
-    },
-  };
-  return res;
-};
-
-export const requestBalance = async (
-  currency: string,
-  amount: number,
-  token: string | null
-): Promise<Res<TransactionRes>> => {
-  let res: Res<TransactionRes>;
-  res = {
-    isError: false,
-    message: "Request Balance Success",
-    data: {
-      transaction: {
-        id: "cl67lxhg80053cxn68q7drfst",
-        from: null,
-        to: "cl67f3g6x0005awpvkigw9xqo",
-        description: "Request Balance 15 USD",
-        amount: 222230.9995236256,
-        approved: false,
-        approvedAt: null,
-        createdAt: new Date(),
-      },
-    },
-  };
-  return res;
-};
-
-export const getCurrencies = async (
-  token: string | null
-): Promise<Res<CurrenciesRes>> => {
-  let res: Res<CurrenciesRes>;
-  res = {
-    isError: false,
-    message: "Get Currencies Success",
-    data: {
-      currencies: currency,
-    },
-  };
-  return res;
-};
-
-export const getUsers = async (
-  token: string | null
-): Promise<Res<UsersRes>> => {
-  let res: Res<UsersRes>;
-  res = {
-    isError: false,
-    message: "Get Users Success",
-    data: {
-      users: [
-        {
-          id: "cl67f3g6x0005awpvkigw9xqo",
-          username: "iqi",
-          role: "USER",
-          isVerified: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "cl67lnui200069jpl73ij4jfs",
-          username: "naufal",
-          role: "USER",
-          isVerified: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-    },
-  };
-  return res;
-};
-
-export const verifyUser = async (
-  userId: string,
-  token: string | null
-): Promise<Res<VerifyRes>> => {
-  let res: Res<VerifyRes>;
-  res = {
-    isError: false,
-    message: "Verify User Success",
-    data: {
-      user: {
-        id: "cl67f3g6x0005awpvkigw9xqo",
-        username: "iqi",
-        role: "USER",
-        isVerified: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    },
-  };
-  return res;
-};
-
-export const getRequests = async (
-  token: string | null
-): Promise<Res<TransactionsRes>> => {
-  let res: Res<TransactionsRes>;
-  res = {
-    isError: false,
-    message: "Get Transactions Success",
-    data: {
-      transactions: [
-        {
-          id: "cl67lxhg80053cxn68q7drfst",
-          from: null,
-          to: "rifqi2320",
-          description: "Request Balance 15 USD",
-          amount: 222230.9995236256,
-          approved: false,
-          approvedAt: null,
-          createdAt: new Date(),
-        },
-      ],
-    },
-  };
-  return res;
-};
-
-export const approveRequest = async (
-  id: string,
-  token: string | null
-): Promise<Res<ApproveRequestRes>> => {
-  let res: Res<ApproveRequestRes>;
-  res = {
-    isError: false,
-    message: "Approve Request Balance Success",
-    data: {
-      transactionApproved: {
-        id: "cl67lxhg80053cxn68q7drfst",
-        from: null,
-        to: "rifqi2320",
-        description: "Request Balance 15 USD",
-        amount: 222230.9995236256,
-        approved: true,
-        approvedAt: new Date(),
-        createdAt: new Date(),
-      },
-    },
-  };
-  return res;
-};
-
-export const rejectRequest = async (
-  id: string,
-  token: string | null
-): Promise<Res<RejectRequestRes>> => {
-  let res: Res<RejectRequestRes>;
-  res = {
-    isError: false,
-    message: "Delete Transaction Success",
-    data: {
-      deletedTransaction: {
-        id: "cl67m0sfr0112cxn6nx4rxxtv",
-        from: null,
-        to: "rifqi2320",
-        description: "Request Balance -1 USD",
-        amount: -14815.39996824171,
-        approved: false,
-        approvedAt: null,
-        createdAt: new Date(),
-      },
-    },
-  };
-  return res;
-};
-
-export const rejectStub = async (): Promise<any> => {
-  return Promise.reject({
-    isError: true,
-    message: "Reject Stub",
-  });
-};

@@ -12,7 +12,6 @@ const InputFile = ({ onChange, accept, ...props }: any) => {
   };
 
   const handleChange = (e: any) => {
-    console.log(e);
     if (e.target.files) {
       if (onChange) {
         onChange(e);

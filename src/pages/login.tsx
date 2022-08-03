@@ -9,6 +9,7 @@ import {
   Link,
   Text,
   useColorMode,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -25,16 +26,35 @@ const Login = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleSubmit = async () => {
-    const user = await login(formData.username, formData.password);
-    if (user) {
-      if (user.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/user");
-      }
-    }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    await login(formData.username, formData.password)
+      .then((user) => {
+        if (user) {
+          if (user.role === "ADMIN") {
+            navigate("/admin");
+          } else {
+            navigate("/user");
+          }
+        }
+      })
+      .catch((err) => {
+        if (err.response.data.message) {
+          toast({
+            title: "Error",
+            description: err.response.data.message,
+            status: "error",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Something went wrong",
+            status: "error",
+          });
+        }
+      });
   };
 
   return (

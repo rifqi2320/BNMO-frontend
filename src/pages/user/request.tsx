@@ -10,26 +10,42 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import TransactionTable from "../../components/tables/transactionTable";
 import { useAuth } from "../../context/auth";
 import { getCurrencies, requestBalance } from "../../lib/api";
 import { UserContext } from "../../types/context";
+import { Transaction } from "../../types/models";
 
 const Request = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { data, revalidate } = useOutletContext<UserContext>();
+  const { revalidateUser } = useAuth();
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [formData, setFormData] = useState({
-    amount: 0,
+    amount: "",
     currency: "",
   });
+  const [filteredData, setFilteredData] = useState<Transaction[]>([]);
   const { token } = useAuth();
+  const handleSubmitRequesta = async () => {
+    revalidateUser();
+    revalidate();
+  };
   const handleSubmitRequest = async () => {
-    if (formData.amount > 0) {
-      await requestBalance(formData.currency, formData.amount, token)
+    if (isNaN(parseInt(formData.amount))) {
+      toast({
+        title: "Error",
+        description: "Amount must be a number",
+        status: "error",
+      });
+      return;
+    }
+
+    if (parseInt(formData.amount) !== 0) {
+      await requestBalance(formData.currency, parseInt(formData.amount), token)
         .then((res) => {
           if (!res.isError && res.data) {
             revalidate();
@@ -38,14 +54,14 @@ const Request = () => {
               description: res.message,
               status: "success",
             });
-            setFormData({ ...formData, amount: 0 });
+            setFormData({ ...formData, amount: "" });
           }
         })
         .catch((err) => {
-          if (err.message) {
+          if (err.response.data.message) {
             toast({
               title: "Error",
-              description: err.message,
+              description: err.response.data.message,
               status: "error",
             });
           } else {
@@ -65,7 +81,7 @@ const Request = () => {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     getCurrencies(token)
       .then((res) => {
         if (res.isError || !res.data) {
@@ -76,7 +92,12 @@ const Request = () => {
       .catch((err) => {
         navigate("/user/request");
       });
-  });
+
+    if (data) {
+      setFilteredData(data.filter((item) => !item.from));
+    }
+  }, [data, navigate, token]);
+
   return (
     <>
       <Stack p={4} direction={["column", "column", "row"]}>
@@ -101,12 +122,11 @@ const Request = () => {
             <FormControl>
               <FormLabel w="100%">Amount</FormLabel>
               <Input
-                type="number"
                 value={formData.amount}
                 onChange={(e) => {
                   setFormData({
                     ...formData,
-                    amount: parseInt(e.target.value),
+                    amount: e.target.value,
                   });
                 }}
               />
@@ -121,7 +141,7 @@ const Request = () => {
         </VStack>
 
         <TransactionTable
-          transactions={data}
+          transactions={filteredData}
           cols={["createdAt", "amount", "approved"]}
         />
       </Stack>

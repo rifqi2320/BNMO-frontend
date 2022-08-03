@@ -12,7 +12,6 @@ export type LoginReq = {
   password: string;
 };
 
-// Response
 export type Res<T> = {
   isError: boolean;
   message: string;
@@ -32,7 +31,7 @@ export type RegisterRes = {
 };
 
 export type SelfDataRes = {
-  user: User;
+  userData: User;
 };
 
 export type TransactionsRes = {
