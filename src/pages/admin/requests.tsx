@@ -5,7 +5,6 @@ import {
   useMediaQuery,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import TransactionTable from "../../components/tables/transactionTable";
 import { useAuth } from "../../context/auth";

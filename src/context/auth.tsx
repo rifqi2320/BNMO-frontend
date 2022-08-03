@@ -126,7 +126,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
       }
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.pathname]);
 
   useEffect(() => {
     if (!isLoading) {

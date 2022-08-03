@@ -1,4 +1,4 @@
-import { Flex, useToast } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layouts/sidebar";
@@ -9,7 +9,6 @@ import { Transaction, User } from "../../types/models";
 const Admin = () => {
   const { isLoading, user, token } = useAuth();
   const navigate = useNavigate();
-  const toast = useToast();
 
   const [requests, setRequests] = useState<Transaction[] | null>(null);
   const revalidateRequests = async () => {

@@ -22,7 +22,6 @@ const Request = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { data, revalidate } = useOutletContext<UserContext>();
-  const { revalidateUser } = useAuth();
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     amount: "",
@@ -30,10 +29,6 @@ const Request = () => {
   });
   const [filteredData, setFilteredData] = useState<Transaction[]>([]);
   const { token } = useAuth();
-  const handleSubmitRequesta = async () => {
-    revalidateUser();
-    revalidate();
-  };
   const handleSubmitRequest = async () => {
     if (isNaN(parseInt(formData.amount))) {
       toast({
