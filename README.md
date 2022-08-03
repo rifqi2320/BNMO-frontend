@@ -1,59 +1,42 @@
-This project was bootstrapped with
-[Create React App](https://github.com/facebook/create-react-app).
+# BNMO-frontend
 
-## Available Scripts
+> BMO with an N frontend
 
-In the project directory, you can run:
+![BIG BMO :D](/public/bmo/bmo_2.png)
 
-### `npm start`
+## Link Penting
 
-Runs the app in the development mode.<br /> Open
-[http://localhost:3000](http://localhost:3000) to view it in the browser.
+- [Repo Backend](https://github.com/rifqi2320/BNMO-backend)
+- [Spesifikasi](https://docs.google.com/document/u/2/d/e/2PACX-1vTXfRSh4yLUKN8n0cyRYWwZVF5hvNYPoj-wvOs35dQnrE3iclnVYUx9kUAq0-cZdXztN1nLKGgjBbAa/pub)
 
-The page will reload if you make edits.<br /> You will also see any lint errors
-in the console.
+## Link Deploy
 
-### `npm test`
+- [Frontend (Vercel)](https://bnmo-frontend.vercel.app/)
+- [Backend (Heroku)](https://bnmo-backend.herokuapp.com/)
 
-Launches the test runner in the interactive watch mode.<br /> See the section
-about
-[running tests](https://facebook.github.io/create-react-app/docs/running-tests)
-for more information.
+## Tech Stack
 
-### `npm run build`
+- React JS (Typescript)
+- Chakra UI
 
-Builds the app for production to the `build` folder.<br /> It correctly bundles
-React in production mode and optimizes the build for the best performance.
+## Penggunaan
 
-The build is minified and the filenames include the hashes.<br /> Your app is
-ready to be deployed!
+1. Duplikat `.env.example` yang berada pada folder menjadi `.env` dan isikan data yang sesuai dengan deskripsi dibawah ini
 
-See the section about
-[deployment](https://facebook.github.io/create-react-app/docs/deployment) for
-more information.
+| Variable            | Deskripsi  |
+| :------------------ | :--------- |
+| `REACT_APP_API_URL` | Alamat API |
 
-### `npm run eject`
+2. Install (`npm install`) dan jalankan command `npm run start` untuk memulai server local
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Tambahan
 
-If you aren’t satisfied with the build tool and configuration choices, you can
-`eject` at any time. This command will remove the single build dependency from
-your project.
+- Website bersifat responsive (mobile friendly)
+- Website mempunyai 2 mode (dark mode)
+- Logo BMO di navbar user dapat di klik untuk mengubah gambar 🥰
 
-Instead, it will copy all the configuration files and the transitive
-dependencies (webpack, Babel, ESLint, etc) right into your project so you have
-full control over them. All of the commands except `eject` will still work, but
-they will point to the copied scripts so you can tweak them. At this point
-you’re on your own.
+## Catatan Pengembang
 
-You don’t have to ever use `eject`. The curated feature set is suitable for
-small and middle deployments, and you shouldn’t feel obligated to use this
-feature. However we understand that this tool wouldn’t be useful if you couldn’t
-customize it when you are ready for it.
+- Website tidak bisa di deploy di heroku karena memakan ram yang sangat besar 😔. Sehingga kecepatan akses akan melambat dikarenakan perbedaan server backend dan front end.
 
-## Learn More
-
-You can learn more in the
-[Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### <b>Dibuat oleh Rifqi Naufal Abdjul (13520062)</b>
